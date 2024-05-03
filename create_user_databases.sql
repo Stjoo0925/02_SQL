@@ -8,8 +8,6 @@
 
 -- show tables;
 
--- CREATE database gangnam default character set utf8;
-
 -- SELECT * FROM user;
 
 -- drop user 'gangnam'@'localhost';
@@ -21,3 +19,6 @@
 -- grant all privileges on gangnam2.* to 'user1'@'localhost';
 
 -- CREATE database gangnam2;
+
+-- show databases;
+
