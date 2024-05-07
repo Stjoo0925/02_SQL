@@ -92,6 +92,7 @@ INSERT INTO user_primaykey (
 
 SELECT * FROM user_primaykey ;
 
+
 /* foreign key */
 -- 참조(references)된 다른 테이블에서 제공하는 값만 사용할 수 있음
 -- 참조 무성을 위배하지 않기 위해 사용
@@ -137,4 +138,98 @@ SELECT
   JOIN user_grade b ON a.grade_code = b.grade_code ;
  
  
+ -- on update set null, on delete set null
+ CREATE TABLE IF NOT EXISTS instructor_foreingkey2(
+	user_no int primary key ,
+	user_name varchar(255) not null ,
+	gender varchar(3) ,
+	phone varchar(255) ,
+	grade_code int ,
+	foreign key(grade_code)
+	REFERENCES user_grade(grade_code)
+	ON UPDATE SET NULL
+	ON DELETE SET NULL
+) ENGINE = innodb ;
 	
+INSERT INTO instructor_foreingkey2
+VALUES (1, '왕강사', '남', '010-2322-2323', 10) ,
+(2, '이상우', '남', '010-2323-2222', 30) ;
+
+SELECT * FROM instructor_foreingkey2 ;
+
+-- 기존에 테이블에서 참조에대한 옵션을 설정하지 않았다.
+-- 이로인해 아래의 update에서 user_grade를 변경한다면 instructor_foreingkey 테이블이 참조하고 있어
+-- 변경할 수 없느 오류가 발생하게 된다.
+DROP TABLE IF EXISTS instructor_foreingkey;
+
+-- grade_code = null
+-- grade_code는 제약조건으로 primary key조건이 부여되었다.
+-- 이로인해 grade_code를 삭제하는 것은 primary key 제약조건에 위배하여 불가능하다.
+UPDATE USER_GRADE
+SET grade_code = 40
+WHERE grade_code = 10 ;
+
+SELECT * FROM user_grade ;
+-- 아래의 테이블을 조회하면 grade_code가 변경됨에 따라 grade_code가 null로 변경된다.
+-- 이는 on update set null 옵션에 의해 참조하는 테이블이 변경되면 자신의 참조값을 null로 처리하는 것이다.
+SELECT
+	*
+  FROM instructor_foreingkey2;
+ 
+DELETE FROM user_grade
+WHERE grade_code = 30 ;
+
+-- 아래의 테이블을 조회하면 grade_code가 변경됨에 따라 grade_code가 null로 변경된다.
+-- 이는 on delete set null 옵션에 의해 참조하는 테이블이 변경되면 자신의 참조값을 null로 처리하는 것이다.
+SELECT
+	*
+  FROM instructor_foreingkey2;
+  
+ /* CHECK */
+DROP TABLE IF EXISTS user_check ;
+
+CREATE TABLE IF NOT EXISTS user_check (
+    user_no INT AUTO_INCREMENT PRIMARY KEY,
+    user_name VARCHAR(255) NOT NULL,
+    gender CHAR(3) CHECK (gender IN ('남', '여')),
+    age INT CHECK (age >= 15)
+) ENGINE = InnoDB;
+
+INSERT INTO user_check
+VALUES
+(NULL, '홍길동', '남', 15) ;
+-- 아래의 값은 gender에 '남' 또는 '여' 만 입력할 수 있도록 설정하였으나 '짭'이라는 값을 입력하여 오류가 발생
+-- (NULL, '김길동', '짭', 20) ;
+-- 아래의 값은 age에 15이상 값만 입력할 수 있도록 설정하였으나 5ㅅ가 입력되어 제약조건을 위배
+-- (NULL, '신짱구', '남', 5) ;
+ 
+
+-- defalut
+-- 	컬럼에 null대신 기본 값 적용
+-- 컬럼 타입이 date일 시 current_date 만 가능하다.
+-- 컬럼 타입이 datetime일 시 current_time과 current_timestamp, now() 모두 사용 가능
+DROP TABLE IF EXISTS tbl_country ;
+
+ CREATE TABLE If NOT EXISTS tbl_country (
+ 	country_code int auto_increment primary key ,
+ 	country_name varchar(255) default '한국' ,
+	poplation varchar(255) default '0명' ,
+	add_day date default (current_date) ,
+	add_time datetime default (current_time)
+) ENGINE = innoDB ;
+
+SELECT * FROM tbl_country;
+
+INSERT INTO tbl_country
+VALUES (null, default, default, default, default) ;
+
+SELECT * FROM tbl_country ;
+
+
+
+
+
+
+
+
+
